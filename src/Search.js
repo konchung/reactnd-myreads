@@ -1,11 +1,10 @@
 import React from 'react'
-import { Redirect, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import * as BooksAPI from './BooksAPI'
 import Book from './Book'
 
 class Search extends React.Component {
     state = {
-        redirectToReferrer: false,
         query: '',
         books: []
     }
@@ -30,18 +29,20 @@ class Search extends React.Component {
     }
 
     updateBook = (e, f) => {
-        this.setState({redirectToReferrer: true})
         this.props.updateBook(e, f)
+        e.shelf = f.target.value
+        this.setState({
+            books: this.state.books.map((book) => {
+                if(book.id === e.id) {
+                    return e
+                }
+                return book
+            })
+        })
     }
 
     render() {
-        const { redirectToReferrer, query, books } = this.state
-
-        if (redirectToReferrer) {
-            return (
-                <Redirect to={'/'} />
-            )
-        }
+        const { query, books } = this.state
 
         return (
             <div className="search-books">
