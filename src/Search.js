@@ -1,30 +1,47 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Redirect, Link } from 'react-router-dom'
 import * as BooksAPI from './BooksAPI'
 import Book from './Book'
 
 class Search extends React.Component {
     state = {
+        redirectToReferrer: false,
         query: '',
         books: []
     }
 
     updateQuery = (query) => {
         this.setState({ query: query.trim() })
-        this.setState({books:[]})
         if (query) {
             BooksAPI.search(query, 50).then((books) => {
-                if(Array.isArray(books))
-                    this.setState({books})
+                if (Array.isArray(books))
+                    this.setState({
+                        books: books.map((book) => {
+                            var arr = this.props.currentBooks.filter((b) => b.id === book.id)
+                            if (arr.length > 0) {
+                                return arr[0]
+                            } else {
+                                return book
+                            }
+                        })
+                    })
             })
         }
     }
 
+    updateBook = (e, f) => {
+        this.setState({redirectToReferrer: true})
+        this.props.updateBook(e, f)
+    }
+
     render() {
-        const { query, books } = this.state
-        
-        let showBooks
-        showBooks = books
+        const { redirectToReferrer, query, books } = this.state
+
+        if (redirectToReferrer) {
+            return (
+                <Redirect to={'/'} />
+            )
+        }
 
         return (
             <div className="search-books">
@@ -48,8 +65,8 @@ class Search extends React.Component {
                 </div>
                 <div className="search-books-results">
                     <ol className="books-grid">
-                        {showBooks.map((d,i) => (
-                            <Book key={i} meta={d} />
+                        {books.map((d, i) => (
+                            <Book key={i} meta={d} onShelfChange={this.updateBook} />
                         ))}
                     </ol>
                 </div>

@@ -1,34 +1,25 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import Bookshelf from './Bookshelf'
-import * as BooksAPI from './BooksAPI'
 
 class Store extends React.Component {
-    state = {
-        books: []
-    }
-
-    componentDidMount() {
-        BooksAPI.getAll().then((books) => {
-            this.setState({ books })
-        })
-    }
-
-    getBooksByShelf(c) {
-        return this.state.books.filter((b) => b.shelf === c)
+    getBooksByShelf(books, c) {
+        return books.filter((b) => b.shelf === c)
     }
 
     render() {
+        const { books, updateBook } = this.props
+
         return (
             <div className="list-books">
                 <div className="list-books-title">
-                    <h1>MyReads</h1>
+                    <h1>Konway's Reads</h1>
                 </div>
                 <div className="list-books-content">
                     <div>
-                        <Bookshelf title="Currently Reading" books={this.getBooksByShelf("currentlyReading")} />
-                        <Bookshelf title="Want to Read" books={this.getBooksByShelf("wantToRead")} />
-                        <Bookshelf title="Read" books={this.getBooksByShelf("read")} />
+                        <Bookshelf title="Currently Reading" books={this.getBooksByShelf(books, "currentlyReading")} onShelfChange={updateBook} />
+                        <Bookshelf title="Want to Read" books={this.getBooksByShelf(books, "wantToRead")} onShelfChange={updateBook} />
+                        <Bookshelf title="Read" books={this.getBooksByShelf(books, "read")} onShelfChange={updateBook} />
                     </div>
                 </div>
                 <div className="open-search">
